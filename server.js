@@ -36,12 +36,19 @@ const server = http.createServer(app);
 //   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 //   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 // }));
+// app.use(cors({ 
+//   origin: [
+//     "https://new-erp-services-tets.vercel.app",
+//     "http://localhost:3000"
+//   ],
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+// }));
+
 app.use(cors({ 
-  origin: [
-    "https://new-erp-services-tets.vercel.app",
-    "http://localhost:3000"
-  ],
-  credentials: true,
+  origin: "*", 
+  credentials: false, 
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
@@ -68,17 +75,27 @@ app.use(morgan("dev"));
 // });
 
 
+// const io = new SocketIOServer(server, {
+//   cors: {
+//     origin: [
+//       "https://new-erp-services-tets.vercel.app",
+//       "http://localhost:3000"
+//     ],
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true
+//   },
+//   transports: ["websocket", "polling"]
+// });
+
 const io = new SocketIOServer(server, {
   cors: {
-    origin: [
-      "https://new-erp-services-tets.vercel.app",
-      "http://localhost:3000"
-    ],
+    origin: "*", // Temporary wildcard
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    credentials: false
   },
   transports: ["websocket", "polling"]
 });
+
 // Socket authentication middleware
 io.use((socket, next) => {
   const token = socket.handshake.auth.token || socket.handshake.headers.token;
