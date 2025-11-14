@@ -17,6 +17,7 @@ const resendLimiter = rateLimit({
 });
 
 // ----------------- Register -----------------
+// ----------------- Register -----------------
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password, roles = ["buyer"] } = req.body;
@@ -41,17 +42,29 @@ router.post("/register", async (req, res) => {
       isVerified: false,
     });
 
-    try {
-      await sendVerificationEmail(email, code);
-    } catch (mailErr) {
-      console.error("Mail error:", mailErr);
-      return res.status(201).json({
-        message: "Registered but failed to send verification email. Contact admin.",
-        email: user.email
-      });
-    }
+    // ✅ IMMEDIATELY RESPOND TO CLIENT
+    res.status(201).json({ 
+      message: "Registration successful! Verification email is being sent.", 
+      email: user.email,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        roles: user.roles
+      }
+    });
 
-    return res.status(201).json({ message: "Registered. Verification code sent to email.", email: user.email });
+    // 🔥 SEND EMAIL IN BACKGROUND (non-blocking)
+    setTimeout(async () => {
+      try {
+        await sendVerificationEmail(email, code);
+        console.log(`✅ Verification email sent to ${email}`);
+      } catch (mailErr) {
+        console.error(`Failed to send email to ${email}:`, mailErr);
+        // Don't crash the app - email failure shouldn't affect registration
+      }
+    }, 0);
+
   } catch (err) {
     console.error("Register error:", err);
     return res.status(500).json({ message: "Server error" });
@@ -90,6 +103,7 @@ router.post("/verify-email", async (req, res) => {
 });
 
 // ----------------- Resend Code -----------------
+// ----------------- Resend Code -----------------
 router.post("/resend-code", resendLimiter, async (req, res) => {
   try {
     const { email } = req.body;
@@ -104,14 +118,19 @@ router.post("/resend-code", resendLimiter, async (req, res) => {
     user.verificationCodeExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    try {
-      await sendVerificationEmail(email, code);
-    } catch (mailErr) {
-      console.error("Resend mail error:", mailErr);
-      return res.status(500).json({ message: "Failed to send email" });
-    }
+    // ✅ IMMEDIATE RESPONSE
+    res.json({ message: "Verification code is being resent to your email." });
 
-    return res.json({ message: "Verification code resent" });
+    // 🔥 SEND EMAIL IN BACKGROUND
+    setTimeout(async () => {
+      try {
+        await sendVerificationEmail(email, code);
+        console.log(`✅ Resent verification email to ${email}`);
+      } catch (mailErr) {
+        console.error(`❌ Failed to resend email to ${email}:`, mailErr);
+      }
+    }, 0);
+
   } catch (err) {
     console.error("Resend error:", err);
     return res.status(500).json({ message: "Server error" });
