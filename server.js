@@ -28,7 +28,7 @@
 // // Setup socket.io
 // const io = new SocketIOServer(server, {
 //   cors: {
-//     origin: process.env.CLIENT_URL || "http://localhost:3000",
+//     origin: process.env.CLIENT_URL || "${process.env.REACT_APP_FRONTEND_URL}",
 //     methods: ["GET", "POST", "PUT", "DELETE"],
 //     credentials: true
 //   },
@@ -70,7 +70,7 @@
 
 // // Middleware
 // app.use(cors({ 
-//   origin: process.env.CLIENT_URL || "http://localhost:3000",
+//   origin: process.env.CLIENT_URL || "${process.env.REACT_APP_FRONTEND_URL}",
 //   credentials: true 
 // }));
 
@@ -272,7 +272,7 @@ const server = http.createServer(app);
 
 // ==================== CORS MIDDLEWARE (MUST BE FIRST) ====================
 app.use(cors({ 
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: process.env.CLIENT_URL || "${process.env.REACT_APP_FRONTEND_URL}",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
@@ -292,7 +292,7 @@ app.use(morgan("dev"));
 // ==================== SOCKET.IO SETUP ====================
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "${process.env.REACT_APP_FRONTEND_URL}",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   },
@@ -409,6 +409,9 @@ app.use((error, req, res, next) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("Backend is live and running..");
+}); 
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

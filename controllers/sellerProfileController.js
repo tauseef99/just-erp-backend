@@ -186,9 +186,9 @@ export const getAllSellerProfiles = async (req, res) => {
         
         // FIXED: Check both seller profileImage and user profileImage
         img: seller.profileImage 
-          ? `http://localhost:5000/uploads/${seller.profileImage}`
+          ? `${process.env.REACT_APP_API_URL}/uploads/${seller.profileImage}`
           : seller.userId?.profileImage
-            ? `http://localhost:5000/uploads/${seller.userId.profileImage}`
+            ? `${process.env.REACT_APP_API_URL}/uploads/${seller.userId.profileImage}`
             : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
         
         description: seller.about || "Professional ERP services provider",

@@ -58,7 +58,7 @@ router.get('/profile/all', auth, async (req, res) => {
       reviews: seller.reviewCount || 0,
       price: 100, // Default price or calculate based on services
       delivery: "1-2 days", // Default delivery time
-      img: seller.profileImage ? `http://localhost:5000/uploads/${seller.profileImage}` : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      img: seller.profileImage ? `${process.env.REACT_APP_API_URL}/uploads/${seller.profileImage}` : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       description: seller.about || seller.professionalSummary || "Experienced ERP professional",
       level: seller.level || "Level 2 ERP Specialist",
       location: seller.location || "Location not specified",
