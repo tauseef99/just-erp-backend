@@ -29,6 +29,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const server = http.createServer(app);
 
+app.set('trust proxy', 1);
+
 // ==================== CORS MIDDLEWARE (MUST BE FIRST) ====================
 // app.use(cors({ 
 //   origin: process.env.CLIENT_URL || "${process.env.REACT_APP_FRONTEND_URL}",
